@@ -131,6 +131,10 @@ def main():
                 if event.key == pygame.K_r:
                     randomize_playfield()
                     print(longest_path(random.choice(points), random.choice(points)))
+                
+                if event.key == pygame.K_s:
+                    for coll in list(set([random.choice(connections) for i in range (5)])):
+                        connections.remove(coll)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 circle = click_to_circle(event.pos[0], event.pos[1])
