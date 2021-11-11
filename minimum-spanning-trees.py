@@ -115,11 +115,12 @@ def main():
     screen.fill((255, 255, 255))
     pygame.display.flip()
     running = True
+    pygame.font.init()
+    font = pygame.font.SysFont('Arial', 20)
 
     drag_circle = False
     randomize_playfield()
     while running:
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -159,6 +160,10 @@ def main():
                     drag_circle = False
 
         screen.fill((255, 255, 255))
+        knoten = len(points)
+        kanten = len(connections)
+        written_text = font.render("Knoten: {} Kanten: {}".format(knoten, kanten), False, (0,0,0))
+        screen.blit(written_text, (10, 10))
 
         for connection in connections:
             gfxdraw.line(screen, connection.point1.x, connection.point1.y, connection.point2.x, connection.point2.y, connection.color)
