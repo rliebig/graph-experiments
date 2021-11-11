@@ -7,6 +7,8 @@ from pygame import gfxdraw
 WINDOW_HEIGHT = 600
 WINDOW_WIDTH = 800
 
+CIRCLE_RADIUS = 5
+
 class Point:
     def __init__(self, x, y, color):
         self.x = x
@@ -27,7 +29,7 @@ def distance_between_points(point1, point2):
 
 def create_random_point(x, y):
     global points
-    minimum_distance = 80
+    minimum_distance = 4 * CIRCLE_RADIUS
     x_margin = x - minimum_distance
     y_margin = y - minimum_distance
     while True:
@@ -57,7 +59,7 @@ def randomize_playfield():
     global connections
     points = []
     connections = []
-    for i in range(20):
+    for i in range(250):
         x, y = create_random_point(WINDOW_WIDTH, WINDOW_HEIGHT)
         color = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
         points.append(Point(x, y, color))
@@ -101,7 +103,7 @@ def color_subset(point):
 
 def click_to_circle(x,y):
     for point in points:
-        if distance_between_points((x,y), point) < 20:
+        if distance_between_points((x,y), point) < CIRCLE_RADIUS:
             return point
     return None
 
@@ -136,19 +138,28 @@ def main():
                     for coll in list(set([random.choice(connections) for i in range (5)])):
                         connections.remove(coll)
 
+                if event.key == pygame.K_w:
+                    for i in range(5):
+                        random_point = random.choice(points)
+                        other_random_point = random.choice(points)
+                        connections.append(Connection(random_point, other_random_point))
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 circle = click_to_circle(event.pos[0], event.pos[1])
                 if circle:
                     coll = color_subset(circle)
+                    circuit_color = False
                     for collection in list(set(coll)):
-                        if collection.color == (255, 0, 0):
-                            collection.color = (0, 255, 0)
-                        elif collection.color == (0, 255, 0):
-                            collection.color = (0, 0, 255)
-                        elif collection.color == (0, 0, 255): 
-                            collection.color = (0, 255, 255)
-                        else: 
-                            collection.color = (255, 0, 0)
+                        if circuit_color == False:
+                            if collection.color == (255, 0, 0):
+                                circuit_color = (0, 255, 0)
+                            elif collection.color == (0, 255, 0):
+                                circuit_color = (0, 0, 255)
+                            elif collection.color == (0, 0, 255): 
+                                circuit_color = (0, 255, 255)
+                            else: 
+                                circuit_color = (255, 0, 0)
+                        collection.color = circuit_color
 
                 drag_circle = click_to_circle(event.pos[0], event.pos[1])
 
@@ -172,8 +183,8 @@ def main():
         for connection in connections:
             gfxdraw.line(screen, connection.point1.x, connection.point1.y, connection.point2.x, connection.point2.y, connection.color)
         for point in points:
-            gfxdraw.aacircle(screen,  point.x, point.y, 20, point.color)
-            gfxdraw.filled_circle(screen,  point.x, point.y, 20, point.color)
+            gfxdraw.aacircle(screen,  point.x, point.y, CIRCLE_RADIUS, point.color)
+            gfxdraw.filled_circle(screen,  point.x, point.y, CIRCLE_RADIUS, point.color)
         pygame.display.flip()
 
     pygame.quit()
